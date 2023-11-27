@@ -1,4 +1,6 @@
 \documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
 \setcounter{page}{1}
 \title{VRPG for fine tunings goals and path finding}
 \author{Saransh Sharma}
@@ -103,5 +105,269 @@ Finally, we consider the values that influence our decision. For instance, despi
 
 This comprehensive framework allows us to analyze and understand the various factors that influence our decisions and actions.
 
+\subsection{Identifying Objects}
 
+Right now, it's feasible to say that there are possible ways to reduce text or sentences into some form of classes so in our case the classes are as stated above. These classes operate freely at this point we develop a function that tags these classes once we have them. Lets deep dive into a simple method such as calculating a sum of two values in our case.
+
+To apply the concept of ``calculate x'' using the variables resources (R), values (V), and problems (P) as  described, we need to develop a mathematical model that accurately represents the interactions and impacts of these variables on the goal (X).
+
+Variables:
+
+\begin{itemize}
+    \item Resources \( R \): Represent positive contributions towards achieving the goal.
+    \begin{itemize}
+        \item Example: \{1, 2, 3\}
+    \end{itemize}
+    \item Values \( V \): Represent factors that can either contribute positively or negatively, depending on the context.
+    \begin{itemize}
+        \item Example: \{1, 2, 3\}
+    \end{itemize}
+    \item Problems \( P \): Represent hindrances or negative impacts on achieving the goal.
+    \begin{itemize}
+        \item Example: \{1, 2, 4\}
+    \end{itemize}
+\end{itemize}
+
+\textbf{Mathematical Representation:}
+
+\begin{itemize}
+    \item Positive Contribution \( R \): Assign a positive value to each element in \( R \). For instance, if \( R = \{1, 2, 3\} \), each number could represent a certain positive value towards \( X \).
+    \item Negative Contribution \( P \): Assign a negative value to each element in \( P \). In the example \( P = \{1, 2, 4\} \), each number would detract from the goal \( X \).
+    \item Swapping Contribution \( V \): Values in \( V \) can swap between adding to \( R \) or detracting as part of \( P \), depending on certain conditions or thresholds. This requires a rule or function to determine when a value in \( V \) contributes positively or negatively.
+\end{itemize}
+
+\textbf{Calculating \( X \):}
+
+To calculate \( X \), which is the goal, we can construct a function that integrates these variables. One possible approach is:
+
+\begin{enumerate}
+    \item Initial Value of \( X \): Start with \( X = 0 \).
+    \item Add Resources: Increment \( X \) by the sum of the values in \( R \).
+    \item Subtract Problems: Decrement \( X \) by the sum of the values in \( P \).
+    \item Apply Values: For each value in \( V \), determine if it adds to \( R \) or detracts as part of \( P \), and then adjust \( X \) accordingly.
+\end{enumerate}
+
+\textbf{Example Calculation:}
+
+Let's say \( R = \{1, 2, 3\} \), \( V = \{1, 2, 3\} \), and \( P = \{1, 2, 4\} \).
+
+\begin{itemize}
+    \item For simplicity, assume each number represents its own value in the calculation.
+    \item Assume a rule for \( V \): if a value is even, it adds to \( R \); if odd, it adds to \( P \).
+\end{itemize}
+
+Following this:
+
+\begin{itemize}
+    \item \( R \) becomes \( \{1, 2, 3, 2\} \) (adding 2 from \( V \)).
+    \item \( P \) becomes \( \{1, 2, 4, 1, 3\} \) (adding 1 and 3 from \( V \)).
+\end{itemize}
+
+Then calculate \( X \):
+
+\begin{align}
+  X &= \text{sum}(R) - \text{sum}(P) \\
+  &= (1+2+3+2) - (1+2+4+1+3) \\
+  &= 8 - 11 \\
+  &= -3
+\end{align}
+
+In this example, \( X = -3 \), indicating that the problems and negative aspects (P and negative contributions from V) outweigh the resources and positive contributions.
+
+The above steps are simple but there are several considerations that needs to be thought out properly The model needs clear rules for how values in V are assigned to either R or P.
+The values in R, V, and P need to be quantifiable in a way that makes sense for the goal X.
+The model should be flexible to accommodate different scenarios and rules for V.
+Sensitivity analysis might be required to understand how changes in R, V, and P impact X. The specifics of the model would depend on the exact nature of X and the context in which these variables operate.
+
+Now to develop a model that translates user input regarding personal values, resources, and problems into a quantifiable goal (X), we can refine the approach by considering Values (V) as either quantifiers or qualifiers that can become resources or problems based on their positive or negative nature. Basing on the initial model.
+
+\subsection{User Input and calculation model}
+
+\begin{enumerate}
+  \item \textbf{User Input:}
+  \begin{itemize}
+    \item Resources \( R \): Quantifiable positive factors (e.g., time, money, skills).
+    \item Values \( V \): A mix of quantifiable and qualitative factors, each with a potential positive or negative impact.
+    \item Problems \( P \): Quantifiable negative factors (e.g., financial constraints, time limitations).
+  \end{itemize}
+
+  \item \textbf{Quantifying Values \( V \):}
+  \begin{itemize}
+    \item Assign a positive or negative value to each element in \( V \) based on whether it’s a positive or negative influence.
+    \item Positive Influence: Adds to resources (e.g., dedication, network).
+    \item Negative Influence: Adds to problems (e.g., uncertainty, lack of experience).
+  \end{itemize}
+
+  \item \textbf{Example User Input Conversion:}
+  \begin{align*}
+    R &: \{5 \text{ (time)}, 3 \text{ (money)}\} \\
+    V &: \{\text{dedication} (+2), \text{uncertainty} (-1), \text{creativity} (+1)\} \\
+    P &: \{2 \text{ (financial constraint)}, 3 \text{ (time limitation)}\}
+  \end{align*}
+
+  \item \textbf{Mapping \( V \) to \( R \) and \( P \):}
+  \begin{itemize}
+    \item Add positive elements of \( V \) to \( R \) and negative elements to \( P \).
+    \item New \( R \): \{5 \text{ (time)}, 3 \text{ (money)}, 2 \text{ (dedication)}, 1 \text{ (creativity)}\} = \{5, 3, 2, 1\}
+    \item New \( P \): \{2 \text{ (financial constraint)}, 3 \text{ (time limitation)}, 1 \text{ (uncertainty)}\} = \{2, 3, 1\}
+  \end{itemize}
+
+  \item \textbf{Calculating Goal \( X \):}
+  \begin{itemize}
+    \item Define \( X \) as the net outcome of \( R \) and \( P \).
+    \item \( X = \sum(R) - \sum(P) \).
+  \end{itemize}
+
+  \item \textbf{Performing Calculation with Example:}
+  \begin{align*}
+    X &= \sum(\{5, 3, 2, 1\}) - \sum(\{2, 3, 1\}) \\
+      &= (5 + 3 + 2 + 1) - (2 + 3 + 1) \\
+      &= 11 - 6 \\
+      &= 5
+  \end{align*}
+  In this example, \( X = 5 \), indicating a positive net outcome based on the user’s resources, values, and problems.
+\end{enumerate}
+
+\section*{Considerations and Extensions}
+\begin{itemize}
+  \item User Input Flexibility: The model should accommodate a wide range of inputs, allowing for diverse user circumstances.
+  \item Value Weighting: Depending on the context, different values \( V \) might have different weights or impacts.
+  \item Dynamic Adjustment: Users’ values and circumstances can change over time, so the model should be adaptable.
+  \item Goal Interpretation: The interpretation of \( X \) should be contextual. For example, a high positive \( X \) might indicate a strong likelihood of achieving a goal, while a negative \( X \) might suggest the need for reassessment or additional resources.
+\end{itemize}
+
+This model provides a framework for users to input their personal values, resources, and problems, translating them into a quantifiable measure towards achieving a specific goal. It can serve as a tool for personal or professional development planning, helping users to understand and navigate their unique circumstances. 
+
+As we started out with the example in the begining of our curious case of bird that wishes to make \$ 100,000 a month. Are we ready to plug the data and find out.
+
+
+\subsection{Nuanced Understanding}
+
+In the preceding discourse, it has been elucidated that the computation of values utilizing rudimentary mathematical principles presents a relatively straightforward endeavor. However, the transposition of these calculations to real-world applications is notably more challenging, often necessitating a significant degree of optimization. A pivotal question arises regarding the certainty with which user inputs can be categorically assigned to distinct classifications such as 'Problems' within the linguistic domain. While the symbolic representation of problems is readily identifiable and broadly understood, there exists a tendency towards oversimplification in interpretation. 
+
+Consider the illustrative instance of the aspiration to purchase an aircraft. When this objective is input into the previously discussed model, it may yield a positive outcome, predicated on numerous presumptions. The core inquiry here is whether it is feasible to effectively flatten these variables and reduce them to quantifiable measures. This reductionist approach seeks to transform qualitative aspirations into quantitative metrics, yet the extent to which this is achievable without oversimplification remains a subject of consideration. The challenge lies in preserving the complexity and nuance of real-world scenarios while endeavoring to represent them within a structured mathematical framework.
+
+\section*{Matrix and Vector Approach to Modeling}
+
+Adopting a matrix and vector approach for the model adds a layer of complexity and allows for a more nuanced understanding of how resources, values, and problems interact to influence the goal \( X \).
+\subsection*{Step 1: Define Matrices and Vectors}
+\begin{itemize}
+  \item Resources (\( R \)), Values (\( V \)), and Problems (\( P \)) as matrices or vectors, where each element represents a different aspect or factor.
+  \item Example:
+  \begin{align*}
+    R &= \begin{bmatrix} r_1 & r_2 & \cdots & r_n \end{bmatrix} \\
+    V &= \begin{bmatrix} v_1 & v_2 & \cdots & v_n \end{bmatrix} \\
+    P &= \begin{bmatrix} p_1 & p_2 & \cdots & p_n \end{bmatrix}
+  \end{align*}
+  \item Assigning Values to \( V \): Each value in \( V \) can be either positive (adding to \( R \)) or negative (adding to \( P \)). This can be represented as a transformation matrix or function that maps \( V \) to either \( R \) or \( P \).
+\end{itemize}
+
+\subsection*{Step 2: Matrix and Vector Transformations}
+\begin{itemize}
+  \item Transformation of \( V \): Apply a transformation to \( V \) that splits it into positive and negative components, adding them to \( R \) and \( P \) respectively.
+  \item Example:
+  \begin{align*}
+    \text{Positive } V &= \begin{bmatrix} v_{1+} & v_{2+} & \cdots & v_{n+} \end{bmatrix} \text{ added to } R. \\
+    \text{Negative } V &= \begin{bmatrix} v_{1-} & v_{2-} & \cdots & v_{n-} \end{bmatrix} \text{ added to } P.
+  \end{align*}
+  \item Revised \( R \) and \( P \): After transformation, you get new \( R \) and \( P \) vectors.
+  \begin{itemize}
+    \item New \( R \): Original \( R \) vector plus positive components of \( V \).
+    \item New \( P \): Original \( P \) vector plus negative components of \( V \).
+  \end{itemize}
+\end{itemize}
+
+\subsection*{Step 3: Calculating Goal (\( X \))}
+\begin{itemize}
+  \item Vector Calculation: Calculate \( X \) as a function of the distance or difference between the revised \( R \) and \( P \) vectors. This could be the Euclidean distance.
+  \item Euclidean Distance Example:
+  \[ X = \sqrt{\sum_{i}(r_i - p_i)^2} \]
+  where \( r_i \) and \( p_i \) are elements of the revised \( R \) and \( P \) vectors.
+\end{itemize}
+
+\subsection*{Step 4: Interpreting \( X \)}
+\begin{itemize}
+  \item Positive \( X \): Indicates a greater influence of resources and positive values over problems.
+  \item Negative \( X \): Suggests that problems and negative values outweigh resources.
+  \item Magnitude of \( X \): Represents the overall balance or imbalance between resources, values, and problems.
+\end{itemize}
+
+\subsection*{Considerations}
+\begin{itemize}
+  \item Dimensionality: Ensure \( R \), \( V \), and \( P \) have the same dimensions for mathematical coherence.
+  \item Scaling and Weighting: Different elements might need scaling or weighting based on their relative importance or impact.
+  \item Contextual Interpretation: The meaning of \( X \) should be interpreted in the context of the specific goal or situation.
+\end{itemize}
+
+Using matrices and vector spaces in this way allows for a more sophisticated analysis of the relationships and influences among resources, values, and problems, providing a clearer picture of how they collectively impact the achievement of a goal.
+
+\section*{Matrix and Vector Model Application to Aircraft Purchase}
+
+To apply the matrix and vector model to the goal of buying an aircraft, we first need to define our variables - Resources (R), Values (V), and Problems (P) - in the context of this goal. Then we can perform a simple calculation using these elements.
+
+\subsection*{Defining Variables}
+\textbf{Resources (R):} These might include available budget, access to financing, existing aviation knowledge, etc.\\
+\textit{Example:} \( R = [\text{budget}, \text{financing}, \text{knowledge}] = [50, 30, 20] \)
+
+\textbf{Values (V):} These could be personal or business motivations such as passion for flying, convenience, or business needs.\\
+\textit{Example:} \( V = [\text{passion}, \text{convenience}, \text{business utility}] = [20, 15, 25] \)
+
+\textbf{Problems (P):} These are the challenges or negative aspects such as ongoing costs, regulatory challenges, and maintenance.\\
+\textit{Example:} \( P = [\text{ongoing costs}, \text{regulations}, \text{maintenance}] = [40, 30, 20] \)
+
+\subsection*{Transforming Values (V)}
+Decide how each value in \( V \) contributes positively or negatively. For simplicity, let's assume all values in \( V \) are positive and add to \( R \).\\
+\textit{Revised R = Original R + V =} \( [50, 30, 20] + [20, 15, 25] = [70, 45, 45] \)
+
+\subsection*{Calculating Goal (X)}
+Calculate \( X \) as the Euclidean distance between the revised \( R \) and \( P \).
+\[ X = \sqrt{(r_1 - p_1)^2 + (r_2 - p_2)^2 + (r_3 - p_3)^2} \]
+
+Using our example values:
+\[ X = \sqrt{(70 - 40)^2 + (45 - 30)^2 + (45 - 20)^2} \]
+\[ X = \sqrt{(30)^2 + (15)^2 + (25)^2} \]
+\[ X = \sqrt{900 + 225 + 625} \]
+\[ X = \sqrt{1750} \]
+
+\subsection*{Performing the Calculation}
+Let's calculate this in Python for an accurate result.\\	
+The calculated value of \( X \) in the context of buying an aircraft is approximately 41.83.
+
+\begin{lstlisting}[language=Python]
+
+	import math
+
+# Defining the variables
+        R = [70, 45, 45]  # Revised Resources (original R + V)
+        P = [40, 30, 20]  # Problems
+
+# Calculating X as the Euclidean distance between R and P
+       X = math.sqrt(sum((r - p) ** 2 for r, p in zip(R, P)))
+       X	
+	\end{lstlisting}
+
+\subsection*{Interpretation:}
+\textbf{Positive Value:} Since \( X \) is positive, it suggests that the combined resources and positive values outweigh the problems.\\
+\textbf{Magnitude:} The magnitude (41.83) indicates the extent to which resources and values surpass the challenges.
+
+This result can be interpreted as a generally favorable situation for achieving the goal of buying an aircraft, with the resources and positive values (like passion, convenience, and business utility) having a stronger impact than the identified problems (ongoing costs, regulations, maintenance). However, the actual decision should also consider qualitative aspects and personal circumstances beyond what the model can quantify.
+
+
+\section{From Qualifiers to Quantifiers}
+
+In the preceding model, the generation of numerical values from ostensibly qualitative data presents an intriguing conundrum. One might ponder the rationale behind assigning a specific numeric value, such as 20, to an abstract concept like 'knowledge.' This process, ostensibly, is predicated on a functional mechanism that ascertains these values. While methodologies such as Natural Language Processing (NLP) offer potential pathways for this determination, their complexity warrants a more simplified initial approach. Mathematical systems proffer diverse methodologies to assimilate subjective data or abstract elements, such as personal satisfaction or brand reputation.
+
+The standard procedure involves the development of a weight-based scaling system. This technique entails mapping subjective assessments onto a numerical scale. Prevalent approaches include the Likert scale, encompassing a range of 1-5 or 1-10, where each numeral represents a specific degree of concurrence or intensity—1 signifying a minimal level and 10 indicating an extremely high level. An alternative approach is the Ordinal Scale, which involves ranking each element in order of its significance or impact.
+
+Notwithstanding these methods, a significant question arises: where and how to effectively map this data, particularly in scenarios where such information is not directly provided by the user. In such cases, it becomes imperative to extrapolate and predict these values from textual data, subsequently constructing an index based on this analysis.
+
+The situation inexorably leads us to the domain of Natural Language Processing. This field encompasses the analysis of sentiment, emotion recognition, offensiveness, and stance detection within text. An extensive review of relevant literature reveals various attempts and methodologies potentially akin to our objective. The journey towards employing large language models appears to be an unavoidable trajectory, especially in light of the reliance on textual data for this quantification process.
+
+
+\section{Related Work}
+
+In our case its important to understand what 
+
+\section{Conclusion}
+As demonstrated above to reduce down our understanding of a bird suddenly in flight decides to make money may not be the right one but it gets the message right. A larger question that needs to be answered at this point is how do we translate these into machine and make a general purpose solving using the 4 key variables that could be helpful in detection given if we have enough data and values then it all fits in the schema. In the next paper we are going to work on surveying the Deep Learning methods , transformers to reduce down the complexity and reduce text to numbers to our benefit that we could use to plot the goals and other values around it. We have tried our luck using some basic math and tried to uderstand that if its possible to calculate simple additions but to be able to 
 \end{document}
